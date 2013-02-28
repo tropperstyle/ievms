@@ -123,10 +123,10 @@ build_ievm() {
         fi
 
         log "Extracting OVA from ${ievms_home}/${archive}"
-        if ! unrar "${archive}"
+        if ! unzip "${archive}"
         then
             fail "Failed to extract ${archive} to ${ievms_home}/${ova}," \
-                "unrar command returned error code $?"
+                "unzip command returned error code $?"
         fi
     fi
 
