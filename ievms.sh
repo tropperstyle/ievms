@@ -86,35 +86,6 @@ check_ext_pack() {
     fi
 }
 
-download_unar() {
-    unar_url="http://theunarchiver.googlecode.com/files/unar1.5.zip"
-    unar_archive=`basename "${unar_url}"`
-
-    log "Downloading unar from ${unar_url} to ${ievms_home}/${unar_archive}"
-    if [[ ! -f "${unar_archive}" ]] && ! curl ${curl_opts} -L "${unar_url}" -o "${unar_archive}"
-    then
-        fail "Failed to download ${unar_url} to ${ievms_home}/${unar_archive} using 'curl', error code ($?)"
-    fi
-
-    if ! unzip "${unar_archive}"
-    then
-        fail "Failed to extract ${ievms_home}/${unar_archive} to ${ievms_home}/," \
-            "unzip command returned error code $?"
-    fi
-
-    hash unar 2>&- || fail "Could not find unar in ${ievms_home}"
-}
-
-check_unar() {
-    if [ "${kernel}" == "Darwin" ]
-    then
-        PATH="${PATH}:${ievms_home}"
-        hash unar 2>&- || download_unar
-    else
-        hash unar 2>&- || fail "Linux support requires unar (sudo apt-get install for Ubuntu/Debian)"
-    fi
-}
-
 build_ievm() {
     unset archive
     unset unit
@@ -152,10 +123,10 @@ build_ievm() {
         fi
 
         log "Extracting OVA from ${ievms_home}/${archive}"
-        if ! unar "${archive}"
+        if ! unrar "${archive}"
         then
             fail "Failed to extract ${archive} to ${ievms_home}/${ova}," \
-                "unar command returned error code $?"
+                "unrar command returned error code $?"
         fi
     fi
 
@@ -252,7 +223,6 @@ check_system
 create_home
 check_virtualbox
 check_ext_pack
-check_unar
 
 all_versions="6 7 8 9 10"
 for ver in ${IEVMS_VERSIONS:-$all_versions}
